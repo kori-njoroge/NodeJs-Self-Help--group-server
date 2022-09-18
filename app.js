@@ -14,10 +14,14 @@ const saltRound = 10;
 //my app
 const app = express();
 //database
-const db = require('./models');
-const {User} = require('./models');
-const {ApplyLoan} = require('./models');
+const db = require('./models/databasemodels');//editted
+const {User,ApplyLoan} = require('./models/databasemodels');
+// const {ApplyLoan} = require('./models'); //editted
 
+
+//database.
+const sequelize = require('./database/connection');///editted 
+const { where } = require('sequelize');
 
 app.use(express.json());
 app.use(cors(
@@ -56,24 +60,42 @@ app.post('/signup', (req,res) =>{
     const IDnumber = req.body.IDnumber
     const password= req.body.password
 // console.log(req.body);
-    bcrypt.hash(password,saltRound, (err, hash) =>{
+//verification code goes here.
+    User.findAll({where:{phonenumber:phonenumber}}).then(resres =>{
+        // console.log(resres);
+        const regemail = resres[0].email;
+        const regphoneNumber = resres[0].phonenumber;
+        const regIdnumber = resres[0].IDnumber
 
-        User.create({
-            firstname:firstname,
-            lastname:lastname,
-            email:email,
-            phonenumber:phonenumber,
-            IDnumber:IDnumber,
-            password:hash
-        }).catch(err =>{
-            console.log(err);
-        });
+        console.log(regemail,regIdnumber,regphoneNumber);
 
+        if(regphoneNumber === phonenumber){
+            res.send({message:"A user with the phone number already exists!"});
+        }
+        else if(regemail === email){
+            res.send({message:"A user with the email already exists!"});
+        }
+        else if(regIdnumber === IDnumber){
+            res.send({message: "A user with the ID number already exists!"});
+        }else{
+            bcrypt.hash(password,saltRound, (err, hash) =>{
 
-
-    });
+                User.create({
+                    firstname:firstname,
+                    lastname:lastname,
+                    email:email,
+                    phonenumber:phonenumber,
+                    IDnumber:IDnumber,
+                    password:hash
+                }).catch(err =>{
+                    console.log(err);
+                });
+            });
+        }
+    }),
     res.send("Inserted")
 });
+    
 
 app.get('/signin', (req,res) =>{
     if(req.session.user){
@@ -150,6 +172,7 @@ console.log(req.body);
 })
 
 
+
 //LOAN DETAILS ENQUERY.
 app.post('/dashboard/summary', (req,res) =>{
     const currentUser = req.body.UserPhoneNumber;
@@ -164,6 +187,21 @@ app.post('/dashboard/summary', (req,res) =>{
         }).catch(err =>{
             console.log(err);
         })
+    })
+
+    
+
+
+
+//MEMBERS ROUTE.
+    
+app.post('/members', (req,res) =>{
+    User.findAll().then(result =>{
+        console.log(result);
+        res.send(result);
+    }).catch(err =>{
+        console.log(err);
+    });
 })
 
 
@@ -185,9 +223,7 @@ app.post('/dashboard/summary', (req,res) =>{
 
 
 
-
-
-db.sequelize.sync().then(req =>{
+sequelize.sync().then(req =>{//editted
 
     app.listen(3001,()=>{
         console.log('Server running on port 3001');
