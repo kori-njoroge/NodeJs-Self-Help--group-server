@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const nodemailer = require('nodemailer');
+
+// pass: 'edinqmqllshvowss'
 
 //cookies and sessions
 const bodyParser = require('body-parser');
@@ -8,14 +11,14 @@ const session = require('express-session');
 
 //encryption
 const bcrypt = require('bcrypt');
-const { response } = require('express');
+// const { response } = require('express');
 const saltRound = 10;
 
 //my app
 const app = express();
 //database
 const db = require('./models/databasemodels');//editted
-const {User,ApplyLoan} = require('./models/databasemodels');
+const {User,ApplyLoan,Savings,DeclinedLoan} = require('./models/databasemodels');
 // const {ApplyLoan} = require('./models'); //editted
 
 
@@ -47,6 +50,29 @@ app.use(session(
         }
     }
 ))
+//SETTING UP MAILER
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+    user: 'standrewswomengroup@gmail.com',
+    pass: 'edinqmqllshvowss'
+    }
+});
+
+// const mailOptions = {
+//     from: 'standrewswomengroup@gmail.com',
+//     to: 'joaninamulwa@gmail.com',
+//     subject: 'Corey Loves you babey!',
+//     text: 'That was easy!'
+//     };
+
+// transporter.sendMail(mailOptions, function(error, info){
+//     if (error) {
+//         console.log(error);
+//     } else {
+//         console.log('Email sent: ' + info.response);
+//     }
+//     });
 
 
 //REGISTER.
@@ -59,42 +85,44 @@ app.post('/signup', (req,res) =>{
     const phonenumber = req.body.phonenumber
     const IDnumber = req.body.IDnumber
     const password= req.body.password
-// console.log(req.body);
-//verification code goes here.
-    User.findAll({where:{phonenumber:phonenumber}}).then(resres =>{
-        // console.log(resres);
-        const regemail = resres[0].email;
-        const regphoneNumber = resres[0].phonenumber;
-        const regIdnumber = resres[0].IDnumber
 
-        console.log(regemail,regIdnumber,regphoneNumber);
+console.log(req.body);
+        bcrypt.hash(password,saltRound, (err, hash) =>{
 
-        if(regphoneNumber === phonenumber){
-            res.send({message:"A user with the phone number already exists!"});
-        }
-        else if(regemail === email){
-            res.send({message:"A user with the email already exists!"});
-        }
-        else if(regIdnumber === IDnumber){
-            res.send({message: "A user with the ID number already exists!"});
-        }else{
-            bcrypt.hash(password,saltRound, (err, hash) =>{
+    //mailer
+    const mailOptions = {
+            from: 'standrewswomengroup@gmail.com',
+            to: `${email}`,
+            subject: 'Registration!',
+            text: `Iam ${firstname}  ${lastname} my number is ${phonenumber} and my ID number is ${IDnumber}, welcome to andrews sait group`
+            };
 
-                User.create({
-                    firstname:firstname,
-                    lastname:lastname,
-                    email:email,
-                    phonenumber:phonenumber,
-                    IDnumber:IDnumber,
-                    password:hash
-                }).catch(err =>{
-                    console.log(err);
+            User.create({
+                firstname:firstname,
+                lastname:lastname,
+                email:email,
+                phonenumber:phonenumber,
+                IDnumber:IDnumber,
+                password:hash
+            }).then(success =>{
+                res.send({message:"Registration successful!"});
+
+            transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
                 });
+
+            }).catch(err =>{
+                res.send({message:"A user with the details already exists!"});
+                console.log(err);
             });
-        }
-    }),
-    res.send("Inserted")
-});
+        });
+
+    })
+
     
 
 app.get('/signin', (req,res) =>{
@@ -105,6 +133,8 @@ app.get('/signin', (req,res) =>{
     }
 });
 
+
+
 //LOGIN
 //login details from database
 app.post('/signin', (req,res) =>{
@@ -112,12 +142,14 @@ app.post('/signin', (req,res) =>{
     const phonenumber = req.body.phonenumber;
     const password= req.body.password;
 
-User.findAll({where:{phonenumber: phonenumber}}).then((result) =>{
+User.findAll({
+    include:ApplyLoan,
+    where:{phonenumber: phonenumber}}).then((result) =>{
         if(result.length >0){
             bcrypt.compare(password, result[0].password,(error, response) =>{
                 if(response){
                     req.session.user = result;
-                    // console.log(req.session.user);
+                    console.log(result);
                     res.send(result);
                 }else{
             res.send({message: "Credentials do not match"});
@@ -126,13 +158,14 @@ User.findAll({where:{phonenumber: phonenumber}}).then((result) =>{
         }else{
             res.send({message: "User doesn't exist"});
         }
-        // console.log(result);
     })
 });
 
 //LOANS DATABASE.
+
 app.post('/applyloan', (req,res) =>{
 
+    
     const  firstName = req.body.firstName
     const  lastName = req.body.lastName
     const  IDnumber =req.body.IDnumber
@@ -148,7 +181,35 @@ app.post('/applyloan', (req,res) =>{
     const  g2lastName =req.body.g2lastName
     const  g2IDnumber= req.body.g2IDnumber
     const  g2phoneNumber =req.body.g2phoneNumber
+    const  userid= req.body.useridentity
+
+    //global Variables.
+
+
+    User.findAll(
+        {where:
+            {phonenumber: phonenumber}
+        }
+        ).then(result =>{
+
+            console.log("********************");
+            console.log(result);
+            const emailo = result[0].email;
+            console.log(emailo);
+            console.log("********************");        
+            
+
 console.log(req.body);
+
+     //mailer
+    const mailOptions = {
+        from: 'standrewswomengroup@gmail.com',
+        to: `${emailo}`,
+        subject: 'Loan Application!',
+        text: `Dear ${firstName}  
+    Your loan application of ${amount} has been received!
+    Your guarantors are ${g1firstName} ${g2firstName} `
+        };
     ApplyLoan.create({
         firstname:firstName,
         lastname:lastName,
@@ -164,11 +225,26 @@ console.log(req.body);
         g2firstname:g2firstName,
         g2lastname:g2lastName,
         g2IDnumber:g2IDnumber,
-        g2phonenumber:g2phoneNumber
+        g2phonenumber:g2phoneNumber,
+        UserUserId:userid
+    }).then(success =>{
+
+        transporter.sendMail(mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+            });
+            res.send({message:"Application ya loan iko fiti"});
     }).catch(err =>{
         console.log(err);
+        // res.send(err);
+        res.send({message: "You already applied for a loan"});
     });
-    res.send("application successful");
+}).catch(err =>{
+    console.log(err);
+})
 })
 
 
@@ -189,7 +265,10 @@ app.post('/dashboard/summary', (req,res) =>{
         })
     })
 
-    
+
+
+
+
 
 
 
@@ -203,14 +282,6 @@ app.post('/members', (req,res) =>{
         console.log(err);
     });
 })
-
-
-
-
-
-
-
-
 
 
 

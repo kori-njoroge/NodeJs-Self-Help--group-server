@@ -26,6 +26,7 @@ const userSchema ={
     email:{
         type: Sequelize.STRING,
         allowNull:false,
+        unique:true,
         validate:{
             notEmpty:true,
         }
@@ -33,6 +34,7 @@ const userSchema ={
     phonenumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
+        unique:true,
         validate:{
         notEmpty:true
             }
@@ -40,6 +42,7 @@ const userSchema ={
     IDnumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
+        unique:true,
         validate:{
             notEmpty:true
         }
@@ -77,7 +80,8 @@ const ApplyLoanSchema = {
     },
     IDnumber:{
         type: Sequelize.BIGINT,
-        // allowNull:false,
+        allowNull:false,
+        unique:true,
         validate:{
             notEmpty:true
         }
@@ -85,6 +89,7 @@ const ApplyLoanSchema = {
     phonenumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
+        unique:true,
         validate:{
             notEmpty:true
         }
@@ -127,6 +132,7 @@ const ApplyLoanSchema = {
     g1IDnumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
+        unique:true,
         validate:{
             notEmpty:true
         }
@@ -134,6 +140,7 @@ const ApplyLoanSchema = {
     g1phonenumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
+        unique:true,
         validate:{
             notEmpty:true
         }
@@ -155,6 +162,7 @@ const ApplyLoanSchema = {
     g2IDnumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
+        unique:true,
         validate:{
             notEmpty:true
         }
@@ -162,6 +170,7 @@ const ApplyLoanSchema = {
     g2phonenumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
+        unique:true,
         validate:{
             notEmpty:true
         }
@@ -347,8 +356,12 @@ const Officials = sequelize.define('Official',officialsschema,{timestamps:true})
 const Savings = sequelize.define('Savings', savingsSchema,{timestamps:true});
 
 User.hasOne(OutstandingLoan);
+// OutstandingLoan.belongsTo(User);
 User.hasMany(Savings);
-Officials.hasOne(OutstandingLoan);
+// Savings.belongsTo(User)
+// Officials.hasOne(OutstandingLoan);
+User.hasOne(ApplyLoan);
+ApplyLoan.belongsTo(User);
 Officials.hasMany(Savings);
 
 
