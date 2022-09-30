@@ -284,6 +284,16 @@ app.post('/members', (req,res) =>{
 })
 
 
+///ADMIN PAGES
+app.post('/admin/adminMembers', (req,res) =>{
+    User.findAll().then(result =>{
+        console.log(result);
+        res.send(result);
+    }).catch(err =>{
+        console.log(err);
+    });
+})
+
 
 
 
