@@ -174,6 +174,13 @@ const ApplyLoanSchema = {
         validate:{
             notEmpty:true
         }
+    },
+    loanStatus:{
+        type: Sequelize.STRING,
+        allowNull:false,
+        validate:{
+            notEmpty:true
+        }
     }
 }
 
@@ -260,55 +267,55 @@ const declinedLoanSchema ={
         allowNull:false
     }
 }
-const officialsschema ={
-    OfficialId:{
-        type:Sequelize.INTEGER(100),
-        allowNull:false,
-        primaryKey:true,
-        autoIncrement:true
-    },
-    firstname:{
-        type: Sequelize.STRING,
-        allowNull:false,
-        validate:{
-            notEmpty:true
-        }
-    },
-    lastname:{
-        type: Sequelize.STRING,
-        allowNull:false,
-        validate:{
-            notEmpty:true
-        }
-    },
-    email:{
-        type: Sequelize.STRING,
-        allowNull:false,
-        validate:{
-            notEmpty:true,
-        }
-    },phonenumber:{
-        type: Sequelize.BIGINT,
-        allowNull:false,
-        validate:{
-            notEmpty:true
-    }
-    },
-    IDnumber:{
-        type: Sequelize.BIGINT,
-        allowNull:false,
-        validate:{
-            notEmpty:true
-        }
-    },
-    password:{
-        type: Sequelize.STRING(500),
-        allowNull:false,
-        validate:{
-            notEmpty:true
-        }
-    }
-}
+// const officialsschema ={
+//     OfficialId:{
+//         type:Sequelize.INTEGER(100),
+//         allowNull:false,
+//         primaryKey:true,
+//         autoIncrement:true
+//     },
+//     firstname:{
+//         type: Sequelize.STRING,
+//         allowNull:false,
+//         validate:{
+//             notEmpty:true
+//         }
+//     },
+//     lastname:{
+//         type: Sequelize.STRING,
+//         allowNull:false,
+//         validate:{
+//             notEmpty:true
+//         }
+//     },
+//     email:{
+//         type: Sequelize.STRING,
+//         allowNull:false,
+//         validate:{
+//             notEmpty:true,
+//         }
+//     },phonenumber:{
+//         type: Sequelize.BIGINT,
+//         allowNull:false,
+//         validate:{
+//             notEmpty:true
+//     }
+//     },
+//     IDnumber:{
+//         type: Sequelize.BIGINT,
+//         allowNull:false,
+//         validate:{
+//             notEmpty:true
+//         }
+//     },
+//     password:{
+//         type: Sequelize.STRING(500),
+//         allowNull:false,
+//         validate:{
+//             notEmpty:true
+//         }
+//     }
+// }
 
 const savingsSchema = {
     savingDepositId:{
@@ -344,6 +351,8 @@ const savingsSchema = {
     }
 
 }
+//Loans section
+
 
 
 
@@ -352,17 +361,12 @@ const User = sequelize.define('User',userSchema,{timestamps: true});
 const ApplyLoan =sequelize.define('ApplyLoan', ApplyLoanSchema,{timestamps:true});
 const OutstandingLoan = sequelize.define('OutstandingLoan',outstandingLoanSchema,{timestamps:true});
 const DeclinedLoan = sequelize.define('DeclinedLoan',declinedLoanSchema,{timestamps:true});
-const Officials = sequelize.define('Official',officialsschema,{timestamps:true});
 const Savings = sequelize.define('Savings', savingsSchema,{timestamps:true});
 
 User.hasOne(OutstandingLoan);
-// OutstandingLoan.belongsTo(User);
 User.hasMany(Savings);
-// Savings.belongsTo(User)
-// Officials.hasOne(OutstandingLoan);
 User.hasOne(ApplyLoan);
 ApplyLoan.belongsTo(User);
-Officials.hasMany(Savings);
 
 
 
@@ -372,6 +376,6 @@ module.exports={
     ApplyLoan,
     OutstandingLoan,
     DeclinedLoan,
-    Officials,
+    // Officials,
     Savings
 }

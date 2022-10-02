@@ -225,6 +225,7 @@ console.log(req.body);
         g2firstname:g2firstName,
         g2lastname:g2lastName,
         g2IDnumber:g2IDnumber,
+        loanStatus:"Pending Approval",
         g2phonenumber:g2phoneNumber,
         UserUserId:userid
     }).then(success =>{
@@ -286,13 +287,34 @@ app.post('/members', (req,res) =>{
 
 ///ADMIN PAGES
 app.post('/admin/adminMembers', (req,res) =>{
-    User.findAll().then(result =>{
-        console.log(result);
-        res.send(result);
-    }).catch(err =>{
-        console.log(err);
-    });
+    User.findAll().then(users =>{
+        // console.log(users);
+        ApplyLoan.findAll().then(loans =>{
+            // console.log(loans);
+            res.send([{"User":users},{"Loans":loans}]);
+            //will add savings one day
+        })
+        
+    })
 })
+
+app.get('/admin/adminMembers', (req, res) =>{
+    const selectedUserId = req.body.selectedUserId;
+    console.log(selectedUserId);
+    ApplyLoan.findAll({where:{
+        UserUserId:selectedUserId
+    }}).then(loanee =>{
+        if(loanee){
+            console.log(loanee);
+            res.send(loanee);
+        }else{
+            res.send("No member matches the user Id");
+        }
+    }).catch(err =>{
+        // res.send(err);
+    })
+}
+)
 
 
 
