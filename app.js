@@ -316,14 +316,28 @@ console.log(req.body);
 //LOAN DETAILS ENQUERY.
 app.post('/dashboard/summary', (req,res) =>{
     const currentUser = req.body.UserPhoneNumber;
+    const savesaver = "Monthly Contribution"
+    const loanPayer = "Loan Service fee"
     console.log(req.body.UserPhoneNumber);
     ApplyLoan.findAll(
-        {where:
+        {
+        where:
             {phonenumber: currentUser}
         }
         ).then((response) =>{
-            // console.log(response);
-            res.send(response);
+            console.log(response);
+            Savings.findAll({where:{
+                phonenumber:currentUser,
+                purpose: savesaver
+            }}).then(saver =>{
+                console.log(saver);
+                Savings.findAll({where:{
+                    phonenumber:currentUser,
+                    purpose:loanPayer
+                }}).then(loanPayerer =>{
+                    res.send([{loaner:response},{saver:saver},{loanPayer:loanPayerer}]);
+                })
+            })
         }).catch(err =>{
             console.log(err);
         })
@@ -345,6 +359,20 @@ app.post('/members', (req,res) =>{
     }).catch(err =>{
         console.log(err);
     });
+})
+
+//MyY LOANS ROUTES
+app.post('/myloans',(req,res) =>{
+    ApplyLoan.findAll({
+        where:{
+            UserUserId:9
+        }
+    }).then(loanee =>{
+        console.log(loanee);
+        // res.send(loanee)
+    }).catch(err =>{
+        res.send({message:"No loan applied by the User"})
+    })
 })
 
 
@@ -393,6 +421,7 @@ app.post('/mywallet' ,(req,res) =>{
     const amount = req.body.amount
     const purpose = req.body.purpose
     const userid = req.body.userid
+    const company = "St Andrews Women Group"
 
     console.log(phonenumber)
     console.log(amount)
@@ -401,42 +430,24 @@ app.post('/mywallet' ,(req,res) =>{
     if(phonenumber){
     ///Another mpesa
     let unirest = require('unirest');
-
-let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
-
-.headers({
-
-    'Content-Type': 'application/json',
-
-    'Authorization': 'Bearer A4Ru2pm6G6hAxq40bM0bT9e5GacC'
-
-})
-
-.send(JSON.stringify({
-
-    "BusinessShortCode": 174379,
-
-    "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMDA0MDMxNjE0",
-
-    "Timestamp": "20221004031614",
-
-    "TransactionType": "CustomerPayBillOnline",
-
-    "Amount": amount,
-
-    "PartyA": phonenumber,
-
-    "PartyB": 174379,
-
-    "PhoneNumber": phonenumber,
-
-    "CallBackURL": "https://mydomain.com/path",
-
-    "AccountReference": "st Andrews Group",
-
-    "TransactionDesc": purpose 
-
-}))
+    let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
+    .headers({
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer NHxG0YanAFqigK5BdiPqCpBSwyQg'
+    })
+    .send(JSON.stringify({
+        "BusinessShortCode": 174379,
+        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMDA0MDcyMzEz",
+        "Timestamp": "20221004072313",
+        "TransactionType": "CustomerPayBillOnline",
+        "Amount": amount,
+        "PartyA": phonenumber,
+        "PartyB": 174379,
+        "PhoneNumber": phonenumber,
+        "CallBackURL": "https://mydomain.com/path",
+        "AccountReference": company,
+        "TransactionDesc": purpose 
+    }))
 
 .end(respo => {
 
