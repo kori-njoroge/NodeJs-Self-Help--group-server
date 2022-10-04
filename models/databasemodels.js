@@ -348,6 +348,13 @@ const savingsSchema = {
     savingsamount:{
             type:Sequelize.INTEGER(20),
             allowNull:false
+    },
+    purpose:{
+        type: Sequelize.STRING,
+        allowNull:false,
+        validate:{
+            notEmpty:true
+        }
     }
 
 }

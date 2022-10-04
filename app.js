@@ -2,7 +2,70 @@ const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 
+///MPESA
+// const Mpesa = require ('mpesa-api').Mpesa;
+// const mpesa = new Mpesa(credentials, environment);
+
+// const credentials = {
+//     clientKey: 'bDPNJtdBmdwLy5SwGGyMOSvdp8ADRp3e',
+//     clientSecret: 'SMVF5geqzkbc7sdv',
+//     initiatorPassword: 'Safaricom999!*!',
+//     // securityCredential: 'YOUR_SECURITY_CREDENTIAL',
+//     certificatePath: 'keys/example.cert'
+// };
+
+///END OF MPESA
+
+///Another mpesa
+// let unirest = require('unirest');
+
+// let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
+
+// .headers({
+
+//     'Content-Type': 'application/json',
+
+//     'Authorization': 'Bearer A4Ru2pm6G6hAxq40bM0bT9e5GacC'
+
+// })
+
+// .send(JSON.stringify({
+
+//     "BusinessShortCode": 174379,
+
+//     "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMDA0MDMxNjE0",
+
+//     "Timestamp": "20221004031614",
+
+//     "TransactionType": "CustomerPayBillOnline",
+
+//     "Amount": 400,
+
+//     "PartyA": 254706306415,
+
+//     "PartyB": 174379,
+
+//     "PhoneNumber": 254706306415,
+
+//     "CallBackURL": "https://mydomain.com/path",
+
+//     "AccountReference": "CompanyXLTD",
+
+//     "TransactionDesc": "Payment of X" 
+
+//   }))
+
+// .end(res => {
+
+//     if (res.error) throw new Error(res.error);
+
+//     console.log(res.raw_body);
+
+// });
+
 // pass: 'edinqmqllshvowss'
+
+
 
 //cookies and sessions
 const bodyParser = require('body-parser');
@@ -299,8 +362,13 @@ app.post('/admin/adminMembers', (req,res) =>{
 })
 
 app.get('/admin/adminMembers', (req, res) =>{
-    const selectedUserId = req.body.selectedUserId;
-    console.log(selectedUserId);
+    if(req){
+        // console.log(req.body)
+    }else{
+        // console.log("Nothing to show");
+    }
+    const selectedUserId = 5;
+    // console.log(selectedUserId);
     ApplyLoan.findAll({where:{
         UserUserId:selectedUserId
     }}).then(loanee =>{
@@ -315,6 +383,84 @@ app.get('/admin/adminMembers', (req, res) =>{
     })
 }
 )
+
+//MY WALLET ROUTE
+app.post('/mywallet' ,(req,res) =>{
+    console.log(req.body);
+    const firstname = req.body.firstname
+    const lastname = req.body.lastname
+    const phonenumber = req.body.phonenumber
+    const amount = req.body.amount
+    const purpose = req.body.purpose
+    const userid = req.body.userid
+
+    console.log(phonenumber)
+    console.log(amount)
+    console.log(purpose)
+    console.log(firstname)
+    if(phonenumber){
+    ///Another mpesa
+    let unirest = require('unirest');
+
+let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
+
+.headers({
+
+    'Content-Type': 'application/json',
+
+    'Authorization': 'Bearer A4Ru2pm6G6hAxq40bM0bT9e5GacC'
+
+})
+
+.send(JSON.stringify({
+
+    "BusinessShortCode": 174379,
+
+    "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMDA0MDMxNjE0",
+
+    "Timestamp": "20221004031614",
+
+    "TransactionType": "CustomerPayBillOnline",
+
+    "Amount": amount,
+
+    "PartyA": phonenumber,
+
+    "PartyB": 174379,
+
+    "PhoneNumber": phonenumber,
+
+    "CallBackURL": "https://mydomain.com/path",
+
+    "AccountReference": "st Andrews Group",
+
+    "TransactionDesc": purpose 
+
+}))
+
+.end(respo => {
+
+    // if (res.error) throw new Error(res.error);
+
+    // console.log(res.raw_body);
+    if(respo.error){
+        // throw new Error(res.error)
+        console.log(respo.error);
+        res.send("We could no process your payment at the moment!")
+    }else{
+        Savings.create({
+            firstname:firstname,
+            lastname:lastname,
+            phonenumber:phonenumber,
+            savingsamount:amount,
+            purpose:purpose,
+            UserUserId:userid
+        })
+    }
+
+});
+    }
+})
 
 
 
