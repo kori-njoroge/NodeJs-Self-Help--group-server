@@ -473,6 +473,30 @@ app.post('/mywallet' ,(req,res) =>{
     }
 })
 
+// ADMIN SAVINGS ROUTE
+app.post('/adminsavings', (req,res) =>{
+    Savings.findAll({where:{
+        purpose:"Monthly Contribution"
+    }}).then(savers =>{
+        // console.log(savers);
+        res.send(savers);
+    })
+})
+
+app.post('/approvedloans', (req,res) =>{
+    ApplyLoan.findAll({where:{
+        loanStatus:"Approved"
+    }}).then(reslt =>{
+        // console.log(reslt);
+        res.send(reslt);
+    })
+})
+
+app.post('/appliedloans/evaluation', (req,res) =>{
+    console.log(req.body)
+    // if(req)
+})
+
 
 
 
