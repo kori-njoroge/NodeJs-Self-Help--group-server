@@ -380,7 +380,9 @@ app.post('/myloans',(req,res) =>{
 app.post('/admin/adminMembers', (req,res) =>{
     User.findAll().then(users =>{
         // console.log(users);
-        ApplyLoan.findAll().then(loans =>{
+        ApplyLoan.findAll({where:{
+            loanStatus:"Pending Approval"
+        }}).then(loans =>{
             // console.log(loans);
             res.send([{"User":users},{"Loans":loans}]);
             //will add savings one day
@@ -389,28 +391,63 @@ app.post('/admin/adminMembers', (req,res) =>{
     })
 })
 
-app.get('/admin/adminMembers', (req, res) =>{
-    if(req){
-        // console.log(req.body)
-    }else{
-        // console.log("Nothing to show");
-    }
-    const selectedUserId = 5;
-    // console.log(selectedUserId);
-    ApplyLoan.findAll({where:{
-        UserUserId:selectedUserId
-    }}).then(loanee =>{
-        if(loanee){
-            console.log(loanee);
-            res.send(loanee);
-        }else{
-            res.send("No member matches the user Id");
+///more details route
+app.post('/admin/adminmembers/moredetails',(req,res) =>{
+    const userid = req.body.userid
+    console.log(userid)
+    Savings.findAll({
+        where:{
+            UserUserId:userid
         }
-    }).catch(err =>{
-        // res.send(err);
+    }).then(savingsrec =>{
+        console.log(savingsrec);
+        ApplyLoan.findAll({
+            where:{
+                UserUserId:userid
+            }
+        }).then(loanRec =>{
+            console.log(loanRec);
+            User.findAll({
+                where:{
+                    UserId:userid
+                }
+            }).then(userfound =>{
+                console.log(userfound)
+                res.send([{User:userfound},{Savings:savingsrec},{loans:loanRec}]);
+            })
+        })
     })
-}
-)
+})
+
+
+// app.get('/admin/adminMembers', (req, res) =>{
+//     if(req){
+//         // console.log(req.body)
+//     }else{
+//         // console.log("Nothing to show");
+//     }
+//     const selectedUserId = 5;
+//     // console.log(selectedUserId);
+//     ApplyLoan.findAll({where:{
+//         UserUserId:selectedUserId
+//     }}).then(loanee =>{
+//         if(loanee){
+//             console.log(loanee);
+//             res.send(loanee);
+//         }else{
+//             res.send("No member matches the user Id");
+//         }
+//     }).catch(err =>{
+//         // res.send(err);
+//     })
+// }
+// )
+
+
+
+
+
+
 
 //MY WALLET ROUTE
 app.post('/mywallet' ,(req,res) =>{
@@ -492,10 +529,28 @@ app.post('/approvedloans', (req,res) =>{
     })
 })
 
-app.post('/appliedloans/evaluation', (req,res) =>{
+
+
+app.post('/admin/appliedloans/evaluation', (req,res) =>{
+    // Boo!
+    // Yaay!
+    const idloan = req.body.loanid
     console.log(req.body)
-    // if(req)
+    if(req.body.status === "Yaay!"){
+        console.log("maahn")
+        ApplyLoan.update(
+            {loanStatus:"Approved"},
+            {where:{loanId:idloan}}
+        )
+    }else if(req.body.status === "Boo!"){
+        console.log("Kuwa serious")
+        ApplyLoan.update(
+            {loanStatus:"Rejected"},
+            {where:{loanId:idloan}}
+        )
+    }
 })
+
 
 
 
