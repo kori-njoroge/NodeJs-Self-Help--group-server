@@ -157,7 +157,10 @@ console.log(req.body);
             from: 'standrewswomengroup@gmail.com',
             to: `${email}`,
             subject: 'Registration!',
-            text: `Iam ${firstname}  ${lastname} my number is ${phonenumber} and my ID number is ${IDnumber}, welcome to andrews sait group`
+            text: `Hello,${firstname}  ${lastname} 
+            Your Registration was successful,
+            welcome to St Andrews Group
+            Thank you `
             };
 
             User.create({
@@ -270,8 +273,9 @@ console.log(req.body);
         to: `${emailo}`,
         subject: 'Loan Application!',
         text: `Dear ${firstName}  
-    Your loan application of ${amount} has been received!
-    Your guarantors are ${g1firstName} ${g2firstName} `
+        Your loan application of ${amount} has been received!
+        You will be notified on approval
+        Thank you`
         };
     ApplyLoan.create({
         firstname:firstName,
@@ -300,7 +304,7 @@ console.log(req.body);
                 console.log('Email sent: ' + info.response);
             }
             });
-            res.send({message:"Application ya loan iko fiti"});
+            res.send({message:"Loan Application Successful!"});
     }).catch(err =>{
         console.log(err);
         // res.send(err);
@@ -363,13 +367,15 @@ app.post('/members', (req,res) =>{
 
 //MyY LOANS ROUTES
 app.post('/myloans',(req,res) =>{
+    console.log("hello",req.body.userId)
+    const userID = req.body.userId
     ApplyLoan.findAll({
         where:{
-            UserUserId:9
+            UserUserId:userID
         }
     }).then(loanee =>{
-        console.log(loanee);
-        // res.send(loanee)
+        console.log("loanee",loanee);   
+        res.send(loanee)
     }).catch(err =>{
         res.send({message:"No loan applied by the User"})
     })
@@ -458,6 +464,7 @@ app.post('/mywallet' ,(req,res) =>{
     const amount = req.body.amount
     const purpose = req.body.purpose
     const userid = req.body.userid
+    const phone= req.body.phonepay
     const company = "St Andrews Women Group"
 
     console.log(phonenumber)
@@ -470,21 +477,22 @@ app.post('/mywallet' ,(req,res) =>{
     let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
     .headers({
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer NHxG0YanAFqigK5BdiPqCpBSwyQg'
+        'Authorization': 'Bearer dmXIXg0tMkTtKrVLVXPR2dwAonOB'
     })
     .send(JSON.stringify({
         "BusinessShortCode": 174379,
-        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMDA0MDcyMzEz",
-        "Timestamp": "20221004072313",
+        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMDA1MTM0ODIx",
+        "Timestamp": "20221005134821",
         "TransactionType": "CustomerPayBillOnline",
         "Amount": amount,
-        "PartyA": phonenumber,
+        "PartyA": phone,
         "PartyB": 174379,
-        "PhoneNumber": phonenumber,
+        "PhoneNumber": phone,
         "CallBackURL": "https://mydomain.com/path",
         "AccountReference": company,
-        "TransactionDesc": purpose 
+        "TransactionDesc": company 
     }))
+    // res.send("Transaction")
 
 .end(respo => {
 
@@ -494,7 +502,7 @@ app.post('/mywallet' ,(req,res) =>{
     if(respo.error){
         // throw new Error(res.error)
         console.log(respo.error);
-        res.send("We could no process your payment at the moment!")
+        res.send("We could not process your payment at the moment!")
     }else{
         Savings.create({
             firstname:firstname,
