@@ -477,12 +477,13 @@ app.post('/mywallet' ,(req,res) =>{
     let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
     .headers({
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer dmXIXg0tMkTtKrVLVXPR2dwAonOB'
+        'Authorization': 'Bearer A9wDUeBE2EeEGXRnsOHIhAgizeys'
     })
+
     .send(JSON.stringify({
         "BusinessShortCode": 174379,
-        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMDA1MTM0ODIx",
-        "Timestamp": "20221005134821",
+        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMTIxMTkwMjU5",
+        "Timestamp": "20221121190259",
         "TransactionType": "CustomerPayBillOnline",
         "Amount": amount,
         "PartyA": phone,
@@ -512,6 +513,7 @@ app.post('/mywallet' ,(req,res) =>{
             purpose:purpose,
             UserUserId:userid
         })
+        res.send("Transaction Successful!")
     }
 
 });
