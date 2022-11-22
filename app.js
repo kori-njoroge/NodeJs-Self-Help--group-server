@@ -573,7 +573,7 @@ app.post('/admin/appliedloans/evaluation', (req,res) =>{
 
 sequelize.sync().then(req =>{//editted
 
-    app.listen(443,()=>{
-        console.log('Server running on port 443');
+    app.listen(3000,()=>{
+        console.log('Server running on port 3000');
     });
 });
