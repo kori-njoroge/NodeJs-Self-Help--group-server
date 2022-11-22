@@ -571,7 +571,6 @@ app.post('/admin/appliedloans/evaluation', (req,res) =>{
 
 
 
-
 sequelize.sync().then(req =>{//editted
 
     app.listen(3000,()=>{
