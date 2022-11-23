@@ -308,7 +308,7 @@ console.log(req.body);
             res.send({message:"Loan Application Successful!"});
     }).catch(err =>{
         console.log(err);
-        res.send(err);
+        // res.send(err);
         res.send({message: "You already applied for a loan"});
     });
 }).catch(err =>{
