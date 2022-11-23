@@ -242,11 +242,11 @@ app.post('/applyloan', (req,res) =>{
     const  purpose = req.body.purpose
     const  g1firstName =  req.body.g1firstName
     const  g1lastName = req.body.g1lastName 
-    const  g1IDnumber = req.body.g1IDnumber
+    // const  g1IDnumber = req.body.g1IDnumber
     const  g1phoneNumber = req.body.g1phoneNumber
     const  g2firstName= req.body.g2firstName
     const  g2lastName =req.body.g2lastName
-    const  g2IDnumber= req.body.g2IDnumber
+    // const  g2IDnumber= req.body.g2IDnumber
     const  g2phoneNumber =req.body.g2phoneNumber
     const  userid= req.body.useridentity
 
@@ -288,11 +288,11 @@ console.log(req.body);
         purpose:purpose,
         g1firstname:g1firstName,
         g1lastname:g1lastName,
-        g1IDnumber:g1IDnumber,
+        // g1IDnumber:g1IDnumber,
         g1phonenumber:g1phoneNumber,
         g2firstname:g2firstName,
         g2lastname:g2lastName,
-        g2IDnumber:g2IDnumber,
+        // g2IDnumber:g2IDnumber,
         loanStatus:"Pending Approval",
         g2phonenumber:g2phoneNumber,
         UserUserId:userid
@@ -308,7 +308,7 @@ console.log(req.body);
             res.send({message:"Loan Application Successful!"});
     }).catch(err =>{
         console.log(err);
-        // res.send(err);
+        res.send(err);
         res.send({message: "You already applied for a loan"});
     });
 }).catch(err =>{

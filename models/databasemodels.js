@@ -129,14 +129,14 @@ const ApplyLoanSchema = {
             notEmpty:true
         }
     },
-    g1IDnumber:{
-        type: Sequelize.BIGINT,
-        allowNull:false,
-        unique:true,
-        validate:{
-            notEmpty:true
-        }
-    },
+    // g1IDnumber:{
+    //     type: Sequelize.BIGINT,
+    //     allowNull:false,
+    //     unique:true,
+    //     validate:{
+    //         notEmpty:true
+    //     }
+    // },
     g1phonenumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
@@ -159,14 +159,14 @@ const ApplyLoanSchema = {
             notEmpty:true
         }
     },
-    g2IDnumber:{
-        type: Sequelize.BIGINT,
-        allowNull:false,
-        unique:true,
-        validate:{
-            notEmpty:true
-        }
-    },
+    // g2IDnumber:{
+    //     type: Sequelize.BIGINT,
+    //     allowNull:false,
+    //     unique:true,
+    //     validate:{
+    //         notEmpty:true
+    //     }
+    // },
     g2phonenumber:{
         type: Sequelize.BIGINT,
         allowNull:false,
