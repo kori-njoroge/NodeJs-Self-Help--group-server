@@ -190,6 +190,10 @@ console.log(req.body);
 
     })
 
+app.get('/test', (req,res) =>{
+    res.send("Corey's server is up!")
+})
+
     
 
 app.get('/signin', (req,res) =>{
@@ -298,6 +302,7 @@ console.log(req.body);
         UserUserId:userid
     }).then(success =>{
 
+        //sending the mail
         transporter.sendMail(mailOptions, function(error, info){
             if (error) {
                 console.log(error);
