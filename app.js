@@ -105,6 +105,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(session(
     {
         key: "userId",
+        SameSite:"None",
         secret:"AmTheSecretWhatDidYouExpect",
         resave: false,
         saveUninitialized:false,
@@ -125,7 +126,7 @@ const transporter = nodemailer.createTransport({
 // const mailOptions = {
 //     from: 'standrewswomengroup@gmail.com',
 //     to: 'joaninamulwa@gmail.com',
-//     subject: 'Corey Loves you babey!',
+//     subject: 'it meeeee!',
 //     text: 'That was easy!'
 //     };
 
