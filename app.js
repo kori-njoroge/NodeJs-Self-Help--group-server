@@ -92,7 +92,7 @@ const { where } = require('sequelize');
 app.use(express.json());
 app.use(cors(
     {
-        origin: ["http://localhost:3000" || "http://3.86.202.72:3000"],
+        origin: ["http://localhost:3000"],
         methods :["GET","POST"],
         credentials: true
     }
@@ -579,7 +579,7 @@ app.post('/admin/appliedloans/evaluation', (req,res) =>{
 
 sequelize.sync().then(req =>{//editted
 
-    app.listen(3000,()=>{
-        console.log('Server running on port 3000');
+    app.listen(3001,()=>{
+        console.log('Server running on port 3001');
     });
 });
