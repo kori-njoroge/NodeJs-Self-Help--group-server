@@ -190,7 +190,7 @@ console.log(req.body);
 
     })
 
-app.get('/test', (req,res) =>{
+app.get('/', (req,res) =>{
     res.send("Corey's server is up!")
 })
 
