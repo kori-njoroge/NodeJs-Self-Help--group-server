@@ -92,7 +92,7 @@ const { where } = require('sequelize');
 app.use(express.json());
 app.use(cors(
     {
-        origin: ["http://localhost:3000" || "http://3.86.202.72:3000"],
+        origin: ["http://localhost:3000"],
         methods :["GET","POST"],
         credentials: true
     }
