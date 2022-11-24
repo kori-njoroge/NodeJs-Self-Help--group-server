@@ -339,7 +339,9 @@ app.post('/dashboard/summary', (req,res) =>{
             Savings.sum(
                 {where:{
                 phonenumber:currentUser,
-                purpose: savesaver
+                purpose: savesaver,
+                col:'savingsamount'
+                // [sequelize.fn('sum', sequelize.col('amount')), 'total']
             }}).then(saver =>{
                 console.log(saver);
                 Savings.findAll({where:{
