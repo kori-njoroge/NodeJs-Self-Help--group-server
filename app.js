@@ -336,7 +336,8 @@ app.post('/dashboard/summary', (req,res) =>{
         }
         ).then((response) =>{
             console.log(response);
-            Savings.findAll({where:{
+            Savings.sum(
+                {where:{
                 phonenumber:currentUser,
                 purpose: savesaver
             }}).then(saver =>{
