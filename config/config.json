@@ -1,1 +1,24 @@
 
+{
+  "development": {
+    "username": "corey",
+    "password": "Kheriac@1",
+    "database": "myproject",
+    "host": "54.164.66.87 ",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "corey",
+    "password": "Kheriac@1",
+    "database": "database_test",
+    "host": "54.164.66.87",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "corey",
+    "password": "Kheriac@1",
+    "database": "myproject",
+    "host": "54.164.66.87 ",
+    "dialect": "mysql"
+  }
+}
