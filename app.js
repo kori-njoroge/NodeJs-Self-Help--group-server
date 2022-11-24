@@ -92,7 +92,7 @@ const { where } = require('sequelize');
 app.use(express.json());
 app.use(cors(
     {
-        origin: ["http://localhost:3000"],
+        origin: ["http://localhost:3000" || "http://3.86.202.72:3000"],
         methods :["GET","POST"],
         credentials: true
     }
@@ -336,12 +336,9 @@ app.post('/dashboard/summary', (req,res) =>{
         }
         ).then((response) =>{
             console.log(response);
-            Savings.sum(
-                {where:{
+            Savings.findAll({where:{
                 phonenumber:currentUser,
-                purpose: savesaver,
-                col:'savingsamount'
-                // [sequelize.fn('sum', sequelize.col('amount')), 'total']
+                purpose: savesaver
             }}).then(saver =>{
                 console.log(saver);
                 Savings.findAll({where:{
