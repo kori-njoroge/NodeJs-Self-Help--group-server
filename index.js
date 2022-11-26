@@ -10,7 +10,7 @@ const nodemailer = require('nodemailer');
 //     clientKey: 'bDPNJtdBmdwLy5SwGGyMOSvdp8ADRp3e',
 //     clientSecret: 'SMVF5geqzkbc7sdv',
 //     initiatorPassword: 'Safaricom999!*!',
-//     // securityCredential: 'YOUR_SECURITY_CREDENTIAL',
+//     securityCredential: 'YOUR_SECURITY_CREDENTIAL',
 //     certificatePath: 'keys/example.cert'
 // };
 
@@ -344,8 +344,19 @@ app.post('/dashboard/summary', (req,res) =>{
                 Savings.findAll({where:{
                     phonenumber:currentUser,
                     purpose:loanPayer
-                }}).then(loanPayerer =>{
-                    res.send([{loaner:response},{saver:saver},{loanPayer:loanPayerer}]);
+                },
+                attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+            }).then(loanPayerer =>{
+                    Savings.findAll({
+                        where:{
+                    phonenumber:currentUser,
+                    purpose:savesaver
+                    // UserUserId:7
+                        },
+                        attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+                    }).then(resu =>{
+                        res.send([{loaner:response},{saver:saver},{loanPayer:loanPayerer},{'total':resu}]);
+                    })
                 })
             })
         }).catch(err =>{
@@ -353,6 +364,23 @@ app.post('/dashboard/summary', (req,res) =>{
         })
     })
 
+
+    app.get("/mine",(req,res) =>{
+        Savings.findAll({
+            attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+        }).then(total =>{
+            Savings.findAll({
+                where:{
+                    UserUserId:7
+                },
+                attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+            }).then(resu =>{
+                res.send([{'total': total},{'becky':resu}])
+            })
+            // res.send(total);
+        })
+    })
+    
 
 
 
@@ -406,6 +434,7 @@ app.post('/admin/adminMembers', (req,res) =>{
 ///more details route
 app.post('/admin/adminmembers/moredetails',(req,res) =>{
     const userid = req.body.userid
+    const savesaver = "Monthly Contribution";
     console.log(userid)
     Savings.findAll({
         where:{
@@ -424,8 +453,16 @@ app.post('/admin/adminmembers/moredetails',(req,res) =>{
                     UserId:userid
                 }
             }).then(userfound =>{
-                console.log(userfound)
-                res.send([{User:userfound},{Savings:savingsrec},{loans:loanRec}]);
+                Savings.findAll({
+                    where:{
+                        UserUserId:userid,
+                        purpose:savesaver
+                    },
+                    attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+                }).then(total =>{
+                    res.send([{User:userfound},{Savings:savingsrec},{loans:loanRec},{'total':total}]);
+                    console.log(userfound)
+                })
             })
         })
     })
@@ -462,7 +499,52 @@ app.post('/admin/adminmembers/moredetails',(req,res) =>{
 
 
 //MY WALLET ROUTE
-app.post('/mywallet' ,(req,res) =>{
+app.post('/mywallet',(req,res) =>{
+    const userid= req.body.userId;
+    const savesaver = "Monthly Contribution";
+    const loanPayer = "Loan Service fee"
+    console.log(userid)
+    Savings.findAll({
+        where:{
+            UserUserId:userid,
+            purpose: savesaver
+        },
+        // attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+    }).then(response =>{
+        Savings.findAll({
+            where:{
+                UserUserId:userid,
+                purpose: savesaver
+            },
+            attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+    }).then(result =>{
+        Savings.findAll({
+            where:{
+                UserUserId:userid,
+                purpose: loanPayer
+            },
+            attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+        }).then(reply =>{
+            Savings.findAll({
+                where:{
+                    UserUserId:userid,
+                    purpose: loanPayer
+                }
+            }).then(loaner =>{
+                res.send([{'total':result},{'saver':response},{'loantotal':reply},{'loanPayer':loaner}])
+            })
+        })
+    })
+})
+})
+
+
+
+
+
+
+//MPESA
+app.post('/mywallet/mpesa' ,(req,res) =>{
     console.log(req.body);
     const firstname = req.body.firstname
     const lastname = req.body.lastname
@@ -483,13 +565,13 @@ app.post('/mywallet' ,(req,res) =>{
     let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
     .headers({
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer NeJdreBg2FGqIZOkCBGZHMAxhF5v'
+        'Authorization': 'Bearer vhzcjBGegpL70ayRDYR34QwRkSb0'
     })
 
     .send(JSON.stringify({
         "BusinessShortCode": 174379,
-        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMTI0MTIwMzUy",
-        "Timestamp": "20221124120352",
+        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMTI2MTI1MjUy",
+        "Timestamp": "20221126125252",
         "TransactionType": "CustomerPayBillOnline",
         "Amount": amount,
         "PartyA": phone,
@@ -532,7 +614,13 @@ app.post('/adminsavings', (req,res) =>{
         purpose:"Monthly Contribution"
     }}).then(savers =>{
         // console.log(savers);
-        res.send(savers);
+        Savings.findAll({where:{
+            purpose:"Monthly Contribution"
+        },
+        attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+    }).then(total =>{
+            res.send([{'savers':savers},{"total":total}]);
+        })
     })
 })
 
@@ -540,8 +628,13 @@ app.post('/approvedloans', (req,res) =>{
     ApplyLoan.findAll({where:{
         loanStatus:"Approved"
     }}).then(reslt =>{
-        // console.log(reslt);
-        res.send(reslt);
+        ApplyLoan.findAll({
+            where:{
+                loanStatus:"Disbursed"
+            }
+        }).then(response =>{
+            res.send([{"reslt":reslt},{"disbursed":response}]);
+        })
     })
 })
 
@@ -565,6 +658,34 @@ app.post('/admin/appliedloans/evaluation', (req,res) =>{
             {where:{loanId:idloan}}
         )
     }
+})
+
+
+app.post('/admin/groupaccounts', (req,res) =>{
+    const savesaver = "Monthly Contribution"
+    const loanPayer = "Loan Service fee"
+
+    Savings.findAll({
+        where:{
+            purpose:savesaver
+        },
+        attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+    }).then(reply =>{
+        res.send(reply);
+    })
+})
+
+app.post('/admin/approvedloans/disburse', (req,res) =>{
+    const loanId = req.body.loanId
+    console.log(loanId)
+    ApplyLoan.update(
+        {loanStatus:"Disbursed"},
+        {where:{loanId:loanId}}
+    ).then(result =>{
+        res.send({"message":"Loan Status updates successfully"})
+    }).catch(error =>{
+        res.send({"Message":"Error status could not be updated!"});
+    })
 })
 
 
