@@ -664,6 +664,7 @@ app.post('/admin/appliedloans/evaluation', (req,res) =>{
 app.post('/admin/groupaccounts', (req,res) =>{
     const savesaver = "Monthly Contribution"
     const loanPayer = "Loan Service fee"
+    const status = "Disbursed"
 
     Savings.findAll({
         where:{
@@ -671,9 +672,29 @@ app.post('/admin/groupaccounts', (req,res) =>{
         },
         attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
     }).then(reply =>{
-        res.send(reply);
+        Savings.findAll({
+            where:{
+                purpose:loanPayer
+            },
+            attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+        }).then(result =>{
+            ApplyLoan.findAll({
+                where:{
+                    loanStatus:status
+                },
+                attributes: [[sequelize.fn('sum', sequelize.col('amount')),'total']]
+            }).then(loan =>{
+                res.send([{"TotalSavings":reply},{"loanIssued":loan},{"LoanPaid":result},{"regAccount":null}]);
+            }).then(err =>{
+                console.log(err)
+            })
+        }).then(err =>{
+            // res.send(err)
+        })
     })
 })
+
+
 
 app.post('/admin/approvedloans/disburse', (req,res) =>{
     const loanId = req.body.loanId
