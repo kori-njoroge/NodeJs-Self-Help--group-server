@@ -2,6 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 
+////MPESA CONFIG
+const authorization = 'Bearer spj5Zc8HZX1WGNhnu1NWXyGtL95S'
+const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMTI4MTgzOTEx"
+const timestamp = "20221128183911"
+
 ///MPESA
 // const Mpesa = require ('mpesa-api').Mpesa;
 // const mpesa = new Mpesa(credentials, environment);
@@ -172,7 +177,13 @@ console.log(req.body);
                 IDnumber:IDnumber,
                 password:hash
             }).then(success =>{
-                res.send({message:"Registration successful!"});
+                User.findAll({
+                    where:{
+                        phonenumber:phonenumber
+                    }
+                }).then(user =>{
+                    res.send([{message:"Registration successful!"},{"user":user}]);
+                })
 
             transporter.sendMail(mailOptions, function(error, info){
                 if (error) {
@@ -189,6 +200,71 @@ console.log(req.body);
         });
 
     })
+
+
+    app.post('/register',(req,res) =>{
+        const firstname = req.body.firstname
+        const lastname = req.body.lastname
+        const phonenumber = req.body.phonenumber
+        const amount = req.body.amount
+        const purpose = req.body.purpose
+        const userid = req.body.userid
+        const phone= req.body.phonepay
+        const company = "St Andrews Women Group"
+
+        if(phonenumber){
+            ///Another mpesa
+            let unirest = require('unirest');
+            let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
+            .headers({
+                'Content-Type': 'application/json',
+                'Authorization': authorization
+            })
+        
+            .send(JSON.stringify({
+                "BusinessShortCode": 174379,
+                "Password": password,
+                "Timestamp": timestamp,
+                "TransactionType": "CustomerPayBillOnline",
+                "Amount": amount,
+                "PartyA": phone,
+                "PartyB": 174379,
+                "PhoneNumber": phone,
+                "CallBackURL": "https://mydomain.com/path",
+                "AccountReference": company,
+                "TransactionDesc": company 
+            }))
+            // res.send("Transaction")
+        
+        .end(respo => {
+        
+            // if (res.error) throw new Error(res.error);
+        
+            // console.log(res.raw_body);
+            if(respo.error){
+                // throw new Error(res.error)
+                console.log(respo.error);
+                res.send("We could not process your payment at the moment!")
+            }else{
+                Savings.create({
+                    firstname:firstname,
+                    lastname:lastname,
+                    phonenumber:phonenumber,
+                    savingsamount:amount,
+                    purpose:purpose,
+                    UserUserId:userid
+                })
+                res.send("Transaction Successful!")
+            }
+        
+        });
+            }
+
+
+    })
+    
+    
+
 
 app.get('/', (req,res) =>{
     res.send("Corey's server is up!")
@@ -212,6 +288,7 @@ app.post('/signin', (req,res) =>{
 
     const phonenumber = req.body.phonenumber;
     const password= req.body.password;
+    const purpose = 'Registration Fee'
 
 User.findAll({
     include:ApplyLoan,
@@ -221,7 +298,16 @@ User.findAll({
                 if(response){
                     req.session.user = result;
                     console.log(result);
-                    res.send(result);
+                    // res.send(result);
+                    Savings.findAll({
+                        where:{
+                            phonenumber:phonenumber,
+                            purpose:purpose,
+                        },
+                        attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+                    }).then(resut =>{
+                        res.send([{"result":result},{"resut":resut}]);
+                    })
                 }else{
             res.send({message: "Credentials do not match"});
                 }
@@ -565,13 +651,13 @@ app.post('/mywallet/mpesa' ,(req,res) =>{
     let req = unirest('POST', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest')
     .headers({
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer vhzcjBGegpL70ayRDYR34QwRkSb0'
+        'Authorization': authorization
     })
 
     .send(JSON.stringify({
         "BusinessShortCode": 174379,
-        "Password": "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMTI2MTI1MjUy",
-        "Timestamp": "20221126125252",
+        "Password": password,
+        "Timestamp": timestamp,
         "TransactionType": "CustomerPayBillOnline",
         "Amount": amount,
         "PartyA": phone,
