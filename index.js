@@ -3,9 +3,10 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 ////MPESA CONFIG
-const authorization = 'Bearer spj5Zc8HZX1WGNhnu1NWXyGtL95S'
-const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMTI4MTgzOTEx"
-const timestamp = "20221128183911"
+const authorization ='Bearer gG1TOmegUkPzwnDyFqsrD5LulmhA'
+const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMTMwMTE1NDEz"
+const timestamp = "20221130115413"
+
 
 ///MPESA
 // const Mpesa = require ('mpesa-api').Mpesa;
@@ -524,7 +525,8 @@ app.post('/admin/adminmembers/moredetails',(req,res) =>{
     console.log(userid)
     Savings.findAll({
         where:{
-            UserUserId:userid
+            UserUserId:userid,
+            purpose:savesaver
         }
     }).then(savingsrec =>{
         console.log(savingsrec);
@@ -750,6 +752,7 @@ app.post('/admin/appliedloans/evaluation', (req,res) =>{
 app.post('/admin/groupaccounts', (req,res) =>{
     const savesaver = "Monthly Contribution"
     const loanPayer = "Loan Service fee"
+    const registration = "Registration Fee"
     const status = "Disbursed"
 
     Savings.findAll({
@@ -770,7 +773,14 @@ app.post('/admin/groupaccounts', (req,res) =>{
                 },
                 attributes: [[sequelize.fn('sum', sequelize.col('amount')),'total']]
             }).then(loan =>{
-                res.send([{"TotalSavings":reply},{"loanIssued":loan},{"LoanPaid":result},{"regAccount":null}]);
+                Savings.findAll({
+                    where:{
+                        purpose:registration
+                    },
+                    attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
+                }).then(register =>{
+                    res.send([{"TotalSavings":reply},{"loanIssued":loan},{"LoanPaid":result},{"regAccount":register}]);
+                })
             }).then(err =>{
                 console.log(err)
             })
