@@ -3,9 +3,10 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 ////MPESA CONFIG
-const authorization ='Bearer gG1TOmegUkPzwnDyFqsrD5LulmhA'
-const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMTMwMTE1NDEz"
-const timestamp = "20221130115413"
+const authorization ='Bearer xPGvGlO1GuhuFILYZAUCFIAPlEw5'
+const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjAxMTgzMzE1"
+const timestamp =  "20221201183315"
+
 
 
 ///MPESA
@@ -155,6 +156,7 @@ app.post('/signup', (req,res) =>{
     const phonenumber = req.body.phonenumber
     const IDnumber = req.body.IDnumber
     const password= req.body.password
+    const status ='Active'
 
 console.log(req.body);
         bcrypt.hash(password,saltRound, (err, hash) =>{
@@ -176,7 +178,8 @@ console.log(req.body);
                 email:email,
                 phonenumber:phonenumber,
                 IDnumber:IDnumber,
-                password:hash
+                password:hash,
+                accountStatus:status
             }).then(success =>{
                 User.findAll({
                     where:{
@@ -213,6 +216,7 @@ console.log(req.body);
         const phone= req.body.phonepay
         const company = "St Andrews Women Group"
 
+        console.log(req.body)
         if(phonenumber){
             ///Another mpesa
             let unirest = require('unirest');
@@ -239,9 +243,6 @@ console.log(req.body);
         
         .end(respo => {
         
-            // if (res.error) throw new Error(res.error);
-        
-            // console.log(res.raw_body);
             if(respo.error){
                 // throw new Error(res.error)
                 console.log(respo.error);
@@ -340,6 +341,7 @@ app.post('/applyloan', (req,res) =>{
     // const  g2IDnumber= req.body.g2IDnumber
     const  g2phoneNumber =req.body.g2phoneNumber
     const  userid= req.body.useridentity
+    const  interest= req.body.interest
 
     //global Variables.
 
@@ -379,14 +381,13 @@ console.log(req.body);
         purpose:purpose,
         g1firstname:g1firstName,
         g1lastname:g1lastName,
-        // g1IDnumber:g1IDnumber,
         g1phonenumber:g1phoneNumber,
         g2firstname:g2firstName,
         g2lastname:g2lastName,
-        // g2IDnumber:g2IDnumber,
         loanStatus:"Pending Approval",
         g2phonenumber:g2phoneNumber,
-        UserUserId:userid
+        UserUserId:userid,
+        interest:interest
     }).then(success =>{
 
         //sending the mail
@@ -553,6 +554,21 @@ app.post('/admin/adminmembers/moredetails',(req,res) =>{
                 })
             })
         })
+    })
+})
+
+app.post('/moredetails/deactivate', (req,res) =>{
+    const userid = req.body.userId
+    console.log("food",userid);
+    User.update(
+        {accountStatus:'Deactivated'},
+        {where:{
+            userId:userid
+        }}
+    ).then(response =>{
+        console.log(response)
+    }).catch(err =>{
+        console.log(err)
     })
 })
 
@@ -805,7 +821,21 @@ app.post('/admin/approvedloans/disburse', (req,res) =>{
     })
 })
 
+app.post('/cancelLoan', (req,res)=>{
+    console.log("Canceling the loan", req.body)
 
+    const loanId = req.body.loanid
+    console.log("Canceling the loan of id", loanId)
+    ApplyLoan.destroy(
+        {
+        where: {loanId:loanId}
+        }).then(result =>{
+            res.send({"Message":"Loan canceled successfully"})
+        }).catch(error=>{
+            console.log("Geting this eror", error)
+            res.send({"Message":"Error loan could not be canceled"})
+        })
+})
 
 
 
