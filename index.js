@@ -88,7 +88,7 @@ const saltRound = 10;
 const app = express();
 //database
 const db = require('./models/databasemodels');//editted
-const {User,ApplyLoan,Savings,DeclinedLoan} = require('./models/databasemodels');
+const {User,ApplyLoan,Savings,DeclinedLoan,Notify} = require('./models/databasemodels');
 // const {ApplyLoan} = require('./models'); //editted
 
 
@@ -837,6 +837,32 @@ app.post('/cancelLoan', (req,res)=>{
         })
 })
 
+app.post('/notifications', (req,res) =>{
+    const source = req.body.source
+    const phonenumber = req.body.phonenumber
+    const message = req.body.message
+
+    Notify.create(
+        {
+            sourceName:source,
+            phonenumber:phonenumber,
+            message:message
+        }
+        ).then(response =>{
+        res.send("Notification successfully sent!")
+    }).catch(err =>{
+        console.log(err)
+    })
+})
+
+app.get('/notifications', (req,res) =>{
+    Notify.findAll().then(response =>{
+        console.log("Kumekujwo");
+        res.send(response)
+    }).catch(err =>{
+        console.log(err)
+    })
+})
 
 
 
@@ -845,7 +871,7 @@ app.post('/cancelLoan', (req,res)=>{
 
 
 
-sequelize.sync().then(req =>{//editted
+sequelize.sync().then(req =>{
 
     app.listen(3001,()=>{
         console.log('Server running on port 3001');

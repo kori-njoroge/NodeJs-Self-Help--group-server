@@ -267,54 +267,7 @@ const declinedLoanSchema ={
         allowNull:false
     }
 }
-// const officialsschema ={
-//     OfficialId:{
-//         type:Sequelize.INTEGER(100),
-//         allowNull:false,
-//         primaryKey:true,
-//         autoIncrement:true
-//     },
-//     firstname:{
-//         type: Sequelize.STRING,
-//         allowNull:false,
-//         validate:{
-//             notEmpty:true
-//         }
-//     },
-//     lastname:{
-//         type: Sequelize.STRING,
-//         allowNull:false,
-//         validate:{
-//             notEmpty:true
-//         }
-//     },
-//     email:{
-//         type: Sequelize.STRING,
-//         allowNull:false,
-//         validate:{
-//             notEmpty:true,
-//         }
-//     },phonenumber:{
-//         type: Sequelize.BIGINT,
-//         allowNull:false,
-//         validate:{
-//             notEmpty:true
-//     }
-//     },
-//     IDnumber:{
-//         type: Sequelize.BIGINT,
-//         allowNull:false,
-//         validate:{
-//             notEmpty:true
-//         }
-//     },
-//     password:{
-//         type: Sequelize.STRING(500),
-//         allowNull:false,
-//         validate:{
-//             notEmpty:true
-//         }
-//     }
+
 // }
 
 const savingsSchema = {
@@ -360,6 +313,41 @@ const savingsSchema = {
 }
 //Loans section
 
+const NotifySchema = {
+    NotificationId:{
+        type:Sequelize.INTEGER,
+        allowNull:false,
+        primaryKey:true,
+        autoIncrement:true
+    },
+    to:{
+        type:Sequelize.INTEGER,
+        validate:{
+            notEmpty:true
+        }
+    },
+    source:{
+        type: Sequelize.STRING,
+        validate:{
+            notEmpty:true
+        }
+    },
+    phonenumber:{
+        type: Sequelize.BIGINT,
+        validate:{
+        notEmpty:true
+        }
+    },
+    message:{
+        type: Sequelize.STRING,
+        allowNull:false,
+        validate:{
+            notEmpty:true
+        }
+    }
+
+}
+
 
 
 
@@ -369,6 +357,7 @@ const ApplyLoan =sequelize.define('ApplyLoan', ApplyLoanSchema,{timestamps:true}
 const OutstandingLoan = sequelize.define('OutstandingLoan',outstandingLoanSchema,{timestamps:true});
 const DeclinedLoan = sequelize.define('DeclinedLoan',declinedLoanSchema,{timestamps:true});
 const Savings = sequelize.define('Savings', savingsSchema,{timestamps:true});
+const Notify = sequelize.define('Notify', NotifySchema,{timestamps:true});
 
 User.hasOne(OutstandingLoan);
 User.hasMany(Savings);
@@ -384,5 +373,6 @@ module.exports={
     OutstandingLoan,
     DeclinedLoan,
     // Officials,
-    Savings
+    Savings,
+    Notify
 }
