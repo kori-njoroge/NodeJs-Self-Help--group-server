@@ -321,21 +321,24 @@ const NotifySchema = {
         autoIncrement:true
     },
     to:{
-        type:Sequelize.INTEGER,
+        type: Sequelize.STRING(100),
+        allowNull:false,
         validate:{
             notEmpty:true
         }
     },
-    source:{
-        type: Sequelize.STRING,
+    recipientUserId:{
+        type: Sequelize.INTEGER,
+        allowNull:false,
         validate:{
             notEmpty:true
         }
     },
-    phonenumber:{
-        type: Sequelize.BIGINT,
+    subject:{
+        type: Sequelize.STRING(1000),
+        allowNull:false,
         validate:{
-        notEmpty:true
+            notEmpty:true
         }
     },
     message:{
@@ -343,6 +346,20 @@ const NotifySchema = {
         allowNull:false,
         validate:{
             notEmpty:true
+        }
+    },
+    source:{
+        type: Sequelize.STRING,
+        allowNull:false,
+        validate:{
+            notEmpty:true
+        }
+    },
+    phonenumber:{
+        type: Sequelize.BIGINT,
+        allowNull:false,
+        validate:{
+        notEmpty:true
         }
     }
 
@@ -357,7 +374,7 @@ const ApplyLoan =sequelize.define('ApplyLoan', ApplyLoanSchema,{timestamps:true}
 const OutstandingLoan = sequelize.define('OutstandingLoan',outstandingLoanSchema,{timestamps:true});
 const DeclinedLoan = sequelize.define('DeclinedLoan',declinedLoanSchema,{timestamps:true});
 const Savings = sequelize.define('Savings', savingsSchema,{timestamps:true});
-const Notify = sequelize.define('Notify', NotifySchema,{timestamps:true});
+const Notify = sequelize.define('Notification', NotifySchema,{timestamps:true});
 
 User.hasOne(OutstandingLoan);
 User.hasMany(Savings);

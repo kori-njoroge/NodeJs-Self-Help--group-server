@@ -841,26 +841,103 @@ app.post('/notifications', (req,res) =>{
     const source = req.body.source
     const phonenumber = req.body.phonenumber
     const message = req.body.message
+    const to = req.body.to
+    const subject = req.body.subject
+    const id = req.body.id
+    const firstname = req.body.firstname
+console.log('the seent', req.body)
+    if(to === 'All' && id === 0){
+        Notify.create(
+            {   
+                to:to,
+                recipientUserId:00,
+                subject:subject,
+                message:message,
+                source:source,
+                phonenumber:phonenumber
+            }
+            ).then(response =>{
+            res.send("Message sent successfully!")
+        }).catch(err =>{
+            res.send("Message not set try again later!")
+            console.log(err)
+        })
+    }else{
+        if(id > 1){
+        User.findAll({
+            where:{
+                userId:id
+            }
+        }).then(response =>{
+            console.log(response[0])
+            // console.log(response[0].firstname)
+            if(response[0]){
+            if(response[0].firstname === firstname){
 
-    Notify.create(
-        {
-            sourceName:source,
-            phonenumber:phonenumber,
-            message:message
+                Notify.create(
+                    {   
+                        to:to,
+                        recipientUserId:id,
+                        subject:subject,
+                        message:message,
+                        source:source,
+                        phonenumber:phonenumber
+                    }
+                    ).then(response =>{
+                    res.send("Message sent successfully!")
+                }).catch(err =>{
+                    res.send("Message not set try again later!")
+                    console.log(err)
+                })
+            }else{
+                res.send("User found but details do not match")
+            }
+        }else{
+            res.send(`User with the id ${id} not found!`)
         }
-        ).then(response =>{
-        res.send("Notification successfully sent!")
+        })
+    }else{
+        res.send("Please select a valid User!")
+    }
+    }
+})
+
+
+
+app.post('/notificationsclient', (req,res) =>{
+    console.log("me request",req.body.userid)
+    const userid = req.body.userid
+    Notify.findAll(
+        {
+            where:{
+                recipientUserId:userid
+                // to:'All'
+            }
+        }
+    ).then(response =>{
+        console.log("Kumekujwo");
+        Notify.findAll({
+            where:{
+                recipientUserId: 0
+            }
+        }).then(resres =>{
+            console.log(resres[0])
+            res.send([{"response":response},{"resres":resres}]);
+        })
     }).catch(err =>{
         console.log(err)
     })
 })
 
-app.get('/notifications', (req,res) =>{
+
+app.post('/sentmessages', (req,res) =>{
+    console.log(req)
     Notify.findAll().then(response =>{
-        console.log("Kumekujwo");
+        console.log(response);
         res.send(response)
     }).catch(err =>{
         console.log(err)
+        res.send(err)
     })
 })
 
