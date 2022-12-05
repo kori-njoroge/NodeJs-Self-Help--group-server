@@ -294,6 +294,9 @@ app.post('/signin', (req,res) =>{
     const password= req.body.password;
     const purpose = 'Registration Fee'
 
+
+
+
 User.findAll({
     include:ApplyLoan,
     where:{phonenumber: phonenumber}}).then((result) =>{
@@ -310,6 +313,7 @@ User.findAll({
                         },
                         attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
                     }).then(resut =>{
+
                         res.send([{"result":result},{"resut":resut}]);
                     })
                 }else{
@@ -418,11 +422,15 @@ app.post('/dashboard/summary', (req,res) =>{
     const currentUser = req.body.UserPhoneNumber;
     const savesaver = "Monthly Contribution"
     const loanPayer = "Loan Service fee"
+    const status = 'Disbursed'
     console.log(req.body.UserPhoneNumber);
     ApplyLoan.findAll(
         {
         where:
-            {phonenumber: currentUser}
+            {
+                phonenumber: currentUser,
+                loanStatus:status
+            }
         }
         ).then((response) =>{
             console.log(response);
@@ -871,24 +879,35 @@ app.post('/admin/approvedloans/disburse', (req,res) =>{
         {loanStatus:"Disbursed"},
         {where:{loanId:loanId}}
     ).then(result =>{
-        res.send({"message":"Loan Status updates successfully"})
+        res.send({"message":"Loan Status updated successfully"})
     }).catch(error =>{
-        res.send({"Message":"Error status could not be updated!"});
+        res.send({"message":"Error try again later!"});
+    })
+})
+
+
+app.post('/admin/approvedloans/reject', (req,res) =>{
+    const loanId = req.body.loanId
+    console.log(loanId)
+    ApplyLoan.update(
+        {loanStatus:'Rejected'},
+        {where:{loanId:loanId}}
+    ).then(result =>{
+        res.send({"message":"Loan has been Rejected"})
+    }).catch(error =>{
+        res.send({"message":"Error try agin later!"});
     })
 })
 
 app.post('/cancelLoan', (req,res)=>{
-    console.log("Canceling the loan", req.body)
 
     const loanId = req.body.loanid
-    console.log("Canceling the loan of id", loanId)
     ApplyLoan.destroy(
         {
         where: {loanId:loanId}
         }).then(result =>{
             res.send({"Message":"Loan canceled successfully"})
         }).catch(error=>{
-            console.log("Geting this eror", error)
             res.send({"Message":"Error loan could not be canceled"})
         })
 })
