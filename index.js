@@ -340,11 +340,9 @@ app.post('/applyloan', (req,res) =>{
     const  purpose = req.body.purpose
     const  g1firstName =  req.body.g1firstName
     const  g1lastName = req.body.g1lastName 
-    // const  g1IDnumber = req.body.g1IDnumber
     const  g1phoneNumber = req.body.g1phoneNumber
     const  g2firstName= req.body.g2firstName
     const  g2lastName =req.body.g2lastName
-    // const  g2IDnumber= req.body.g2IDnumber
     const  g2phoneNumber =req.body.g2phoneNumber
     const  userid= req.body.useridentity
     const  interest= req.body.interest
@@ -373,9 +371,9 @@ console.log(req.body);
         to: `${emailo}`,
         subject: 'Loan Application!',
         text: `Dear ${firstName}  
-        Your loan application of ${amount} has been received!
-        You will be notified on approval
-        Thank you`
+            Your loan application of ${amount} has been received!
+            You will be notified on approval
+            Thank you`
         };
     ApplyLoan.create({
         firstname:firstName,
@@ -453,7 +451,11 @@ app.post('/dashboard/summary', (req,res) =>{
                         },
                         attributes: [[sequelize.fn('sum', sequelize.col('savingsamount')),'total']]
                     }).then(resu =>{
-                        res.send([{loaner:response},{saver:saver},{loanPayer:loanPayerer},{'total':resu}]);
+                        User.findAll().then(users =>{
+                            res.send([{loaner:response},{saver:saver},{loanPayer:loanPayerer},{'total':resu},{'users':users}]);
+                        }).catch(err =>{
+                            console.log(err);
+                        })
                     })
                 })
             })
