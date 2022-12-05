@@ -3,9 +3,10 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 ////MPESA CONFIG
-const authorization ='Bearer xPGvGlO1GuhuFILYZAUCFIAPlEw5'
-const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjAxMTgzMzE1"
-const timestamp =  "20221201183315"
+const authorization ='Bearer dR0SKtica0wrpI11DZJ5AqV5qwpB'
+const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjA1MDg1NjI3"
+const timestamp =  "20221205085627"
+
 
 
 
@@ -95,6 +96,7 @@ const {User,ApplyLoan,Savings,DeclinedLoan,Notify} = require('./models/databasem
 //database.
 const sequelize = require('./database/connection');///editted 
 const { where } = require('sequelize');
+const { response } = require('express');
 
 app.use(express.json());
 app.use(cors(
@@ -558,18 +560,64 @@ app.post('/admin/adminmembers/moredetails',(req,res) =>{
 })
 
 app.post('/moredetails/deactivate', (req,res) =>{
-    const userid = req.body.userId
+    const userid = req.body.userid
+    const status = 'Deactivated'
     console.log("food",userid);
-    User.update(
-        {accountStatus:'Deactivated'},
-        {where:{
+    User.findAll({
+        where:{
             userId:userid
-        }}
-    ).then(response =>{
-        console.log(response)
-    }).catch(err =>{
-        console.log(err)
+        }
+    }).then(response =>{
+        const name = response[0].firstname
+        if(response[0].accountStatus === status){
+            res.send(`${name}'s Account is already Deactivated`)
+        }else{
+            User.update(
+                {accountStatus:status},
+                {where:{
+                    userId:userid
+                }}
+            ).then(response =>{
+                console.log(response)
+                res.send(`User ${name} successfully  deactivated!`)
+            }).catch(err =>{
+                console.log(err)
+                res.send('Error! try again later')
+            })
+        }
     })
+    
+})
+
+app.post('/moredetails/activate', (req,res) =>{
+    const userid = req.body.userid
+    const status = 'Active'
+    console.log("food",userid);
+    User.findAll({
+        where:{
+            userId:userid
+        }
+    }).then(response =>{
+        console.log(response[0].firstname)
+        const name = response[0].firstname
+        if(response[0].accountStatus === status){
+            res.send(`${name}'s Account is already Active`)
+        }else{
+            User.update(
+                {accountStatus:status},
+                {where:{
+                    userId:userid
+                }}
+            ).then(response =>{
+                console.log(response)
+                res.send(`User ${name} successfully  Activated!`)
+            }).catch(err =>{
+                console.log(err)
+                res.send('Error! try again later')
+            })
+        }
+    })
+    
 })
 
 
@@ -754,13 +802,21 @@ app.post('/admin/appliedloans/evaluation', (req,res) =>{
         ApplyLoan.update(
             {loanStatus:"Approved"},
             {where:{loanId:idloan}}
-        )
+        ).then(response =>{
+            res.send('Loan Approval successful!')
+        }).catch(err =>{
+            res.send('Error! try again later')
+        })
     }else if(req.body.status === "Boo!"){
         console.log("Kuwa serious")
         ApplyLoan.update(
             {loanStatus:"Rejected"},
             {where:{loanId:idloan}}
-        )
+        ).then(response =>{
+            res.send('Loan rejected!')
+        }).catch(err =>{
+            res.send('Error! try again later')
+        })
     }
 })
 
