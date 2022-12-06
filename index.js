@@ -3,9 +3,12 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 ////MPESA CONFIG
-const authorization ='Bearer dR0SKtica0wrpI11DZJ5AqV5qwpB'
-const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjA1MDg1NjI3"
-const timestamp =  "20221205085627"
+const authorization ='Bearer 8AAzyLtMMEhp21DvD8ih58rWmOUs'
+const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjA2MTYxMDQ3"
+const timestamp =  "20221206161047"
+
+
+
 
 
 
@@ -1018,6 +1021,24 @@ app.post('/sentmessages', (req,res) =>{
     })
 })
 
+app.post('/changepassword',(req,res) =>{
+    console.log(req.body)
+    const password = req.body.password
+    const userid = req.body.userId
+    bcrypt.hash(password,saltRound, (err, hash) =>{
+        User.update(
+            {password:hash},
+            {where:{
+                userId:userid
+            }}
+            ).then(respon =>{
+                res.send('Password Update Successfully!')
+            }).catch(err =>{
+                res.send('Error, try again later!')
+            })
+    })
+
+})
 
 
 
