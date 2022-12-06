@@ -3,10 +3,9 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 ////MPESA CONFIG
-const authorization ='Bearer 8AAzyLtMMEhp21DvD8ih58rWmOUs'
-const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjA2MTYxMDQ3"
-const timestamp =  "20221206161047"
-
+const authorization ='Bearer 6bqugSQnp6jLBYu6a8TlWHNVVLwC'
+const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjA2MTgwMzI5"
+const timestamp =  "20221206180329"
 
 
 
