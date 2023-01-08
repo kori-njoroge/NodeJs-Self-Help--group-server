@@ -3,9 +3,9 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 
 ////MPESA CONFIG
-const authorization ='Bearer 6bqugSQnp6jLBYu6a8TlWHNVVLwC'
-const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjA2MTgwMzI5"
-const timestamp =  "20221206180329"
+const authorization ='Bearer shZN5jqAhCzLhDbLUAb8XsoifwAb'
+const password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjA3MTUzMTI1"
+const timestamp =  "20221207153125"
 
 
 
@@ -719,7 +719,7 @@ app.post('/mywallet/mpesa' ,(req,res) =>{
     const phone= req.body.phonepay
     const company = "St Andrews Women Group"
 
-    console.log(phonenumber)
+    console.log(phone)
     console.log(amount)
     console.log(purpose)
     console.log(firstname)
